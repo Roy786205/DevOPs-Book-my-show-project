@@ -10,9 +10,9 @@ pipeline {
 
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
-        DOCKER_IMAGE = 'kastrov/bms:latest'
-        EKS_CLUSTER_NAME = 'kastro-eks'
-        AWS_REGION = 'us-east-1'
+        DOCKER_IMAGE = 'rohit861/bms:latest'
+        EKS_CLUSTER_NAME = 'rohit861-eks'
+        AWS_REGION = 'ap-southeast-1'
     }
 
     stages {
@@ -80,6 +80,7 @@ pipeline {
 
         stage('Docker Build & Push') {
             steps {
+                dir('Book-My-Show-main'){
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
                         sh ''' 
@@ -89,6 +90,7 @@ pipeline {
                         echo "Pushing Docker image to Docker Hub..."
                         docker push $DOCKER_IMAGE
                         '''
+                         }
                     }
                 }
             }
@@ -96,6 +98,7 @@ pipeline {
 
         stage('Deploy to EKS Cluster') {
             steps {
+              dir('Book-My-Show-main'){ 
                 script {
                     sh '''
                     echo "Verifying AWS credentials..."
@@ -115,6 +118,7 @@ pipeline {
                     kubectl get pods
                     kubectl get svc
                     '''
+                    }
                 }
             }
         }
